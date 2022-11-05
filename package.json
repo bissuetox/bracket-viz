@@ -17,7 +17,8 @@
     "commands": [
       {
         "command": "bracket-viz.visualizeBrackets",
-        "title": "Visualize Delimiters"
+        "title": "Visualize Delimiters",
+        "when": "editorHasSelection"
       }
     ],
     "menus": {
