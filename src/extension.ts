@@ -1,4 +1,4 @@
-import { Bracket, BracketPair, isMatchingBracket, LevelString } from './bracket';
+import { Bracket, isMatchingBracket, LevelString } from './bracket';
 import internal = require('stream');
 import * as vscode from 'vscode';
 import { ConsoleReporter } from '@vscode/test-electron';
@@ -26,80 +26,50 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable);
 }
 
-/*
-Prog (                                     )
-      EApp (              ) (             ) 
-            EVar (      )    EVar (      )
-                  Id "x"           Id "x"
-
-*/
-
 function visualizeBrackets(text: string | undefined) {
 	vscode.window.showInformationMessage(`Text selected: ${text}`);
 	let s: string = <string>text;
 	let stack: Array<Bracket> = [];
-	// let pairs: Array<BracketPair> = [];
-
 	try {
 		let level = 1;
 		let maxLevel = 1;
 		let levelString: LevelString = new LevelString(s);
 
-		// Iterate through the string and gather bracket pairs
-		// Assume it's fine - return if bad
+		// Iterate through the string and verify bracket pairs
 		for (let idx=0; idx < s.length; ++idx) {
 			let char = s[idx];
 
 			// If opening delimiter
 			if (delimOpen.indexOf(char) !== -1) {
-				// Track bracket
 				let openBracket = new Bracket(char, "open", idx, idx, s.length - idx);
-				stack.push(openBracket);
-
-				// Increment level and set levelString level
+				stack.push(openBracket); // Add bracket to stack
 				levelString.setLevel(idx, level);
 				++level;
 			}
 
 			// If closing delimiter
 			else if (delimClosed.indexOf(char) !== -1) {
-				// Check if bracket stack empty
 				if (stack.length === 0) {
-					console.error("No opening brackets to match! (Stack empty)");
+					vscode.window.showInformationMessage("No opening brackets to match!");
 					return;
 				}
-				// Check If Open / closed bracket doesn't match
 				let topStack: Bracket = stack[stack.length - 1];
 				if (!isMatchingBracket(topStack.token, char)) {
-					console.error("Bracket mismatch!");
-					return;
+					vscode.window.showInformationMessage("Bracket mismatch!");
+					return; // Open / closed bracket mismatch
 				}
-
-				// Decrement level and set levelString level
-				--level;
+				--level; // Decrement before set - put close in level above
 				levelString.setLevel(idx, level);
-				// console.log(`Registered closing ${char} to lvl ${level}`);
-
-				// Form a pair and add to pairs
 				stack.pop();
-				// let openBracket = stack.pop();
-				// let closedBracket = new Bracket(char, "closed", idx, idx, s.length - idx);
-				// let thisPair = new BracketPair(openBracket!, closedBracket, level);
-				// pairs.push(thisPair);
 			}
-
+			// Else set level to current level
 			else {
 				levelString.setLevel(idx, level);
 			}
-
-			// Track max level
 			if (level >= maxLevel) {
 				maxLevel = level;
 			}
 		}
-
-		console.log('Done scanning...');
-
 
 		// Loop through each level
 		for (let lvl=1; lvl <= maxLevel; lvl++) {
@@ -115,13 +85,11 @@ function visualizeBrackets(text: string | undefined) {
 					thisString += fillerCharacter;
 				}
 			}
-			console.log(`lvl ${lvl}: ${thisString}`);
+			console.log(`lvl ${lvl}: ${thisString}`); // TODO - show in temp file
 		}
-		
 	} catch (e) {
-		console.error(e);
+		vscode.window.showInformationMessage(`${e}`);
 	}
-
 }
 
 // This method is called when your extension is deactivated
