@@ -44,11 +44,10 @@ export class LevelString {
     constructor(text: string) {
         this.text = text;
         this.idxLevels = new Array<number>(text.length - 1);
-        // Initialize to -1
+        // Initialize to 0
         for(let i=0; i<text.length - 1; i++) {
-            this.idxLevels[i] = -1;
+            this.idxLevels[i] = 0;
         }
-        console.log("constructor");
     }
 
     setLevel(idx: number, level: number) {
