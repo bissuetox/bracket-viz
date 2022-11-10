@@ -9,27 +9,40 @@ const fillerCharacter = ' ';
 
 export function activate(context: vscode.ExtensionContext) {
 	console.log('bracket-viz is now active');
-
 	// Use editor? to prevent error for possible undefined value
+	const myScheme = 'bracket-viz';
+	const myProvider = new class implements vscode.TextDocumentContentProvider {
+		onDidChangeEmitter = new vscode.EventEmitter<vscode.Uri>();
+		onDidChange = this.onDidChangeEmitter.event;
+		provideTextDocumentContent(uri: vscode.Uri): string {
+			return visualizeBrackets(uri.path)!;
+		}
+	};
 	
-	let disposable = vscode.commands.registerCommand('bracket-viz.visualizeBrackets', () => {
+	let disposable = vscode.commands.registerCommand('bracket-viz.visualizeBrackets', async () => {
+
 		const text = editor?.document.getText(editor.selection);
 		if (text === undefined || text.length < 2) {
 			vscode.window.showInformationMessage(`Invalid text selected`);
 		} else if (text.indexOf('\n') !== -1) {
 			vscode.window.showInformationMessage(`Cannot visualize multi line input!`);
 		} else {
-			visualizeBrackets(text);
+			let returnedText = visualizeBrackets(text);
+			const uri = vscode.Uri.parse(returnedText!);
+			const doc = await vscode.workspace.openTextDocument(uri); // calls back into the provider
+			await vscode.window.showTextDocument(doc, { preview: false });
 		}
 	});
+
+	context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(myScheme, myProvider));
 
 	context.subscriptions.push(disposable);
 }
 
 function visualizeBrackets(text: string | undefined) {
-	vscode.window.showInformationMessage(`Text selected: ${text}`);
 	let s: string = <string>text;
 	let stack: Array<Bracket> = [];
+	let retString = "";
 	try {
 		let level = 1;
 		let maxLevel = 1;
@@ -51,12 +64,12 @@ function visualizeBrackets(text: string | undefined) {
 			else if (delimClosed.indexOf(char) !== -1) {
 				if (stack.length === 0) {
 					vscode.window.showInformationMessage("No opening brackets to match!");
-					return;
+					return "No opening brackets to match!";
 				}
 				let topStack: Bracket = stack[stack.length - 1];
 				if (!isMatchingBracket(topStack.token, char)) {
 					vscode.window.showInformationMessage("Bracket mismatch!");
-					return; // Open / closed bracket mismatch
+					return "Bracket mismatch!"; // Open / closed bracket mismatch
 				}
 				--level; // Decrement before set - put close in level above
 				levelString.setLevel(idx, level);
@@ -77,16 +90,13 @@ function visualizeBrackets(text: string | undefined) {
 			let thisString = "";
 			for(let idx=0; idx < s.length; ++idx) {
 				// If char level is this iteration level, display it
-				if (levelString.getLevelAtIdx(idx) === lvl) {
-					thisString += s[idx];
-				}
-				// Otherwise show filler
-				else {
-					thisString += fillerCharacter;
-				}
+				thisString += levelString.getLevelAtIdx(idx) === lvl ? s[idx] : fillerCharacter;
 			}
-			console.log(`lvl ${lvl}: ${thisString}`); // TODO - show in temp file
+			retString += `${thisString}\n`;
 		}
+
+		return retString;
+
 	} catch (e) {
 		vscode.window.showInformationMessage(`${e}`);
 	}
