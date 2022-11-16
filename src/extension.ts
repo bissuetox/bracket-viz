@@ -28,8 +28,10 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showInformationMessage(`Cannot visualize multi line input!`);
 		} else {
 			let returnedText = visualizeBrackets(text);
-			const uri = vscode.Uri.parse(returnedText!);
-			const doc = await vscode.workspace.openTextDocument(uri); // calls back into the provider
+			const uri = vscode.Uri.parse('bracket-viz:' + returnedText!);
+			const doc = await vscode.workspace.openTextDocument(uri);
+			// let success = await vscode.commands.executeCommand('editor.action.peekLocations', uri, 0);
+			// ^ doesn't work :(
 			await vscode.window.showTextDocument(doc, { preview: false });
 		}
 	});

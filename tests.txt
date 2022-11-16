@@ -1,0 +1,1 @@
+(let rec append = (\e1.\e2.(if (tl e1) = # then (hd e1) : e2 else (hd e1) : (append (tl e1) e2))) in (append (reverse tl x) (hd x)))
