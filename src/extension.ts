@@ -6,11 +6,13 @@ const editor = vscode.window.activeTextEditor;
 const delimOpen = ['{', '(', '[', '<'];
 const delimClosed = ['}', ')', ']', '>'];
 const fillerCharacter = ' ';
+const myScheme = 'bracket-viz';
+// const tempFileURI = vscode.Uri.parse(`'${myScheme}:tempFile`);
 
 export function activate(context: vscode.ExtensionContext) {
 	console.log('bracket-viz is now active');
 	// Use editor? to prevent error for possible undefined value
-	const myScheme = 'bracket-viz';
+
 	const myProvider = new class implements vscode.TextDocumentContentProvider {
 		onDidChangeEmitter = new vscode.EventEmitter<vscode.Uri>();
 		onDidChange = this.onDidChangeEmitter.event;
@@ -18,8 +20,17 @@ export function activate(context: vscode.ExtensionContext) {
 			return visualizeBrackets(uri.path)!;
 		}
 	};
+
+	// const peekFilter: vscode.DocumentFilter = {
+	// 	scheme: myScheme
+	//  };
+  
+	// // Register the definition provider
+	// context.subscriptions.push(
+	// vscode.languages.registerDefinitionProvider(peekFilter, new PeekFileDefinitionProvider())
+	// );
 	
-	let disposable = vscode.commands.registerCommand('bracket-viz.visualizeBrackets', async () => {
+	let vizDisplosable = vscode.commands.registerCommand('bracket-viz.visualizeBrackets', async () => {
 
 		const text = editor?.document.getText(editor.selection);
 		if (text === undefined || text.length < 2) {
@@ -28,17 +39,22 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showInformationMessage(`Cannot visualize multi line input!`);
 		} else {
 			let returnedText = visualizeBrackets(text);
-			const uri = vscode.Uri.parse('bracket-viz:' + returnedText!);
+			// let returnedText = "hello";
+			const uri = vscode.Uri.parse(`bracket-viz:` + returnedText!);
 			const doc = await vscode.workspace.openTextDocument(uri);
-			// let success = await vscode.commands.executeCommand('editor.action.peekLocations', uri, 0);
+			const docUri = doc.uri
+			const pos = new vscode.Position(0, 1);
+			const loc = new vscode.Location(docUri, new vscode.Position(0, 1));
+			let success = await vscode.commands.executeCommand('editor.action.peekLocations', docUri, pos, loc);
+			// let success = await vscode.commands.executeCommand('vscode.executeDefinitionProvider', uri, 0);
 			// ^ doesn't work :(
-			await vscode.window.showTextDocument(doc, { preview: false });
+			// await vscode.window.showTextDocument(doc, { preview: false });
 		}
 	});
 
 	context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(myScheme, myProvider));
 
-	context.subscriptions.push(disposable);
+	context.subscriptions.push(vizDisplosable);
 }
 
 function visualizeBrackets(text: string | undefined) {
@@ -106,3 +122,17 @@ function visualizeBrackets(text: string | undefined) {
 
 // This method is called when your extension is deactivated
 export function deactivate() {}
+
+// class PeekFileDefinitionProvider implements vscode.DefinitionProvider { 
+// 	provideDefinition(document: vscode.TextDocument,
+// 					  position: vscode.Position,
+// 					  token: vscode.CancellationToken): vscode.Definition {
+// 	   // todo: make this method operate async
+// 	//    let working_dir = path.dirname(document.fileName);
+// 	//    let word        = document.getText(document.getWordRangeAtPosition(position));
+// 	//    let line        = document.lineAt(position);
+ 
+// 	   return new vscode.Location(tempFileURI, new vscode.Position(0, 1));
+// 	}
+//  }
+ 
