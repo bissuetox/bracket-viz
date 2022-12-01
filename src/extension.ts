@@ -31,24 +31,17 @@ export function activate(context: vscode.ExtensionContext) {
 	// );
 	
 	let vizDisplosable = vscode.commands.registerCommand('bracket-viz.visualizeBrackets', async () => {
-
-		const text = editor?.document.getText(editor.selection);
+		let text = editor?.document.getText(editor.selection);
 		if (text === undefined || text.length < 2) {
 			vscode.window.showInformationMessage(`Invalid text selected`);
 		} else if (text.indexOf('\n') !== -1) {
 			vscode.window.showInformationMessage(`Cannot visualize multi line input!`);
 		} else {
-			let returnedText = visualizeBrackets(text);
-			// let returnedText = "hello";
-			const uri = vscode.Uri.parse(`bracket-viz:` + returnedText!);
-			const doc = await vscode.workspace.openTextDocument(uri);
-			const docUri = doc.uri
+			const thisUri = editor?.document.uri;
+			const uri = vscode.Uri.parse(`bracket-viz:` + visualizeBrackets(text));
 			const pos = new vscode.Position(0, 1);
-			const loc = new vscode.Location(docUri, new vscode.Position(0, 1));
-			let success = await vscode.commands.executeCommand('editor.action.peekLocations', docUri, pos, loc);
-			// let success = await vscode.commands.executeCommand('vscode.executeDefinitionProvider', uri, 0);
-			// ^ doesn't work :(
-			// await vscode.window.showTextDocument(doc, { preview: false });
+			const loc = new vscode.Location(uri, new vscode.Position(0, 1));
+			vscode.commands.executeCommand('editor.action.peekLocations', thisUri, pos, [loc]);
 		}
 	});
 
@@ -122,17 +115,3 @@ function visualizeBrackets(text: string | undefined) {
 
 // This method is called when your extension is deactivated
 export function deactivate() {}
-
-// class PeekFileDefinitionProvider implements vscode.DefinitionProvider { 
-// 	provideDefinition(document: vscode.TextDocument,
-// 					  position: vscode.Position,
-// 					  token: vscode.CancellationToken): vscode.Definition {
-// 	   // todo: make this method operate async
-// 	//    let working_dir = path.dirname(document.fileName);
-// 	//    let word        = document.getText(document.getWordRangeAtPosition(position));
-// 	//    let line        = document.lineAt(position);
- 
-// 	   return new vscode.Location(tempFileURI, new vscode.Position(0, 1));
-// 	}
-//  }
- 
