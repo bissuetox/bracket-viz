@@ -39,7 +39,9 @@ export function activate(context: vscode.ExtensionContext) {
 		} else {
 			const thisUri = editor?.document.uri;
 			const uri = vscode.Uri.parse(`bracket-viz:` + visualizeBrackets(text));
-			const pos = new vscode.Position(0, 1);
+			const start = editor?.selection.start.character;
+			const line = editor?.selection.start.line;
+			const pos = new vscode.Position(line!, start!);
 			const loc = new vscode.Location(uri, new vscode.Position(0, 1));
 			vscode.commands.executeCommand('editor.action.peekLocations', thisUri, pos, [loc]);
 		}
