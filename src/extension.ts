@@ -1,44 +1,38 @@
 import { Bracket, isMatchingBracket, LevelString } from './bracket';
 import internal = require('stream');
 import * as vscode from 'vscode';
-import { ConsoleReporter } from '@vscode/test-electron';
-const editor = vscode.window.activeTextEditor;
 const delimOpen = ['{', '(', '[', '<'];
 const delimClosed = ['}', ')', ']', '>'];
 const fillerCharacter = ' ';
 const myScheme = 'bracket-viz';
-// const tempFileURI = vscode.Uri.parse(`'${myScheme}:tempFile`);
+const peekWindowTitle = "Bracket Visualization";
 
 export function activate(context: vscode.ExtensionContext) {
-	console.log('bracket-viz is now active');
+	// console.log('bracket-viz is now active');
 	// Use editor? to prevent error for possible undefined value
 
 	const myProvider = new class implements vscode.TextDocumentContentProvider {
 		onDidChangeEmitter = new vscode.EventEmitter<vscode.Uri>();
 		onDidChange = this.onDidChangeEmitter.event;
 		provideTextDocumentContent(uri: vscode.Uri): string {
-			return visualizeBrackets(uri.path)!;
+			// Peek Title is the uri path
+			// Parse query text so title can be separate
+			const queryText = uri.query;
+			const vizText = visualizeBrackets(queryText)!;
+			return vizText;
 		}
 	};
-
-	// const peekFilter: vscode.DocumentFilter = {
-	// 	scheme: myScheme
-	//  };
-  
-	// // Register the definition provider
-	// context.subscriptions.push(
-	// vscode.languages.registerDefinitionProvider(peekFilter, new PeekFileDefinitionProvider())
-	// );
 	
 	let vizDisplosable = vscode.commands.registerCommand('bracket-viz.visualizeBrackets', async () => {
-		let text = editor?.document.getText(editor.selection);
-		if (text === undefined || text.length < 2) {
-			vscode.window.showInformationMessage(`Invalid text selected`);
-		} else if (text.indexOf('\n') !== -1) {
+		const editor = vscode.window.activeTextEditor; // Must instantiate each time since active editor can change
+		const selectedText = editor?.document.getText(editor.selection);
+		if (selectedText === undefined || selectedText.length < 2) {
+			vscode.window.showInformationMessage(`Invalid selection!`);
+		} else if (selectedText.indexOf('\n') !== -1) {
 			vscode.window.showInformationMessage(`Cannot visualize multi line input!`);
 		} else {
 			const thisUri = editor?.document.uri;
-			const uri = vscode.Uri.parse(`bracket-viz:` + visualizeBrackets(text));
+			const uri = vscode.Uri.parse(`${myScheme}:${peekWindowTitle}?${selectedText}`);
 			const start = editor?.selection.start.character;
 			const line = editor?.selection.start.line;
 			const pos = new vscode.Position(line!, start!);
@@ -48,7 +42,6 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(myScheme, myProvider));
-
 	context.subscriptions.push(vizDisplosable);
 }
 
@@ -115,5 +108,4 @@ function visualizeBrackets(text: string | undefined) {
 	}
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() {}
