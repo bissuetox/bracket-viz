@@ -3,6 +3,7 @@
   "displayName": "bracket-viz",
   "description": "Visualize single line nested delimiters for easy view of nasty nested scopes - targeting Haskell Computations",
   "version": "0.0.1",
+  "publisher": "ChrisKruki",
   "engines": {
     "vscode": "^1.73.0"
   },
