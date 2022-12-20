@@ -1,7 +1,7 @@
 {
   "name": "bracket-viz",
   "displayName": "bracket-viz",
-  "description": "Visualize single line nested delimiters for easy view of nasty nested scopes - targeting Haskell Computations",
+  "description": "Take any amount of delimiter pairs (on a single line) and display them spaced out vertically to concisely emphasize complex nested pairs.",
   "version": "0.0.1",
   "publisher": "ChrisKruki",
   "engines": {
