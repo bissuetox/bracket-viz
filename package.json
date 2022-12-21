@@ -2,9 +2,9 @@
   "name": "bracket-viz",
   "displayName": "Bracket Viz",
   "description": "Vertically visualize nested delimiter pairs",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "ChrisKruki",
-  "icon": "img/Extension_Logo_128.png",
+  "icon": "Extension_Logo_128.png",
   "engines": {
     "vscode": "^1.73.0"
   },
