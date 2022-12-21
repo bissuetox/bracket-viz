@@ -1,9 +1,10 @@
 {
   "name": "bracket-viz",
-  "displayName": "bracket-viz",
-  "description": "Take any amount of delimiter pairs (on a single line) and display them spaced out vertically to concisely emphasize complex nested pairs.",
+  "displayName": "Bracket Viz",
+  "description": "Vertically visualize nested delimiter pairs",
   "version": "0.0.1",
   "publisher": "ChrisKruki",
+  "icon": "img/Extension_Logo_128.png",
   "engines": {
     "vscode": "^1.73.0"
   },

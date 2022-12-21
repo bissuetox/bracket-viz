@@ -7,7 +7,7 @@ Select some text, right click and select the option `Visualize Delimiters`
 
 Selecting it will display an in-line peek dropdown of the visualized text.
 
-![Preview](Extension_Preview.gif)
+![Preview](img/Extension_Preview.gif)
 
 ## Development Mentions
 
