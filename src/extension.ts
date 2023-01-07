@@ -1,5 +1,4 @@
 import { Bracket, isMatchingBracket, LevelString } from './bracket';
-import internal = require('stream');
 import * as vscode from 'vscode';
 const delimOpen = ['{', '(', '[', '<'];
 const delimClosed = ['}', ')', ']', '>'];
@@ -8,9 +7,7 @@ const myScheme = 'bracket-viz';
 const peekWindowTitle = "Bracket Visualization";
 
 export function activate(context: vscode.ExtensionContext) {
-	// console.log('bracket-viz is now active');
 	// Use editor? to prevent error for possible undefined value
-
 	const myProvider = new class implements vscode.TextDocumentContentProvider {
 		onDidChangeEmitter = new vscode.EventEmitter<vscode.Uri>();
 		onDidChange = this.onDidChangeEmitter.event;

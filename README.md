@@ -2,10 +2,12 @@
 
 Take any amount of delimiter pairs (on a single line) and display them spaced out vertically to concisely emphasize complex nested pairs.
 
+[VSCode Extension Link](https://marketplace.visualstudio.com/items?itemName=ChrisKruki.bracket-viz)
+
 # Use
 Select some text, right click and select the option `Visualize Delimiters`
 
-Selecting it will display an in-line peek dropdown of the visualized text.
+An in-line peek dropdown of the visualized text will be displayed.
 
 ![](Extension_Preview.gif)
 

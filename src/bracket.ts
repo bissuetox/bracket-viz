@@ -4,7 +4,7 @@ export class Bracket {
 	public idx: number;
 	public spaceBefore: number;
 	public spaceAfter: number;
-	constructor(token:string, type: string, idx:number, sb:number, sa:number) {
+	constructor(token: string, type: string, idx: number, sb: number, sa: number) {
 		this.token = token;
         this.type = type;
 		this.idx = idx;
